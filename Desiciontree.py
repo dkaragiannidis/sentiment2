@@ -12,15 +12,15 @@ from sklearn.metrics import confusion_matrix, classification_report
 from nltk.stem.snowball import SnowballStemmer
 import numpy
 import  string
-#yelp=pd.read_csv("reviews.csv", low_memory=False).sample(1000)
-#restaurant=pd.read_csv("restaurants.csv", low_memory=False,).sample(1000)
 import pymongo
+#ΑΝΕΒΑΣΜΑ ΑΡΧΕΙΩΝ
 client = pymongo.MongoClient('localhost', 27017)
 db = client['yelp']
 data=db["reviews"].find()
-yelp_reviews=pd.DataFrame(list(data)).sample(1000)
+yelp_reviews=pd.DataFrame(list(data)).sample(10000)
 data2=db["restaurants"].find()
-yelp_restaurant=pd.DataFrame(list(data2)).sample(1000)
+yelp_restaurant=pd.DataFrame(list(data2))
+#ΚΑΝΟΥΜΕ ΤΑ DARAFRAME ΕΝΑ ΚΑΙ ΠΕΤΑΜΕ ΤΟ STARS TOY ΡΕΣΤΟΡΑΝΤ
 yelp_restaurant=yelp_restaurant.drop("stars",axis=1)
 yelp=pd.merge(yelp_reviews,yelp_restaurant,on="business_id",how='inner')
 stemmer = SnowballStemmer("english")
@@ -69,6 +69,20 @@ bow_transformer = CountVectorizer(analyzer=text_process).fit(X)
 print("telow vectorizer")
 len(bow_transformer.vocabulary_)
 X = bow_transformer.transform(X)
+print (X.todense())
+from sklearn.feature_extraction.text import TfidfTransformer
+tfidf = TfidfTransformer(norm="l2")
+tfidf.fit(X)
+print ("IDF:", tfidf.idf_)
+X = tfidf.transform(X)
+print (X.todense())
+print("vocabulary",)
+print('Shape of Sparse Matrix: ', X.shape)
+print('Amount of Non-Zero occurrences: ', X.nnz)
+# Percentage of non-zero values
+density = (100.0 * X.nnz / (X.shape[0] * X.shape[1]))
+print('Density: {}'.format((density)))
+
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 print("split ok")
