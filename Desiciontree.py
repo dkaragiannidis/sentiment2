@@ -109,7 +109,6 @@ from sklearn.linear_model import LinearRegression
 
 lm = LinearRegression()
 lm.fit(X_train, y_train)
-lm.coef
 y_pred = classifier.predict(X_test)
 predictions = lm.predict(X_test)
 plt.scatter(y_test, predictions)
